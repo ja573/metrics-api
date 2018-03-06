@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Usage metrics JSON API prototype. Simple web.py based API to a PostgreSQL database.
+
+usage: python metrics.py
+
+(c) Javier Arias, Open Book Publishers, March 2018
+Use of this software is governed by the terms of the MIT license
+
+Dependencies:
+  python-dateutil==2.4.2
+  psycopg2==2.6.1
+  web.py==0.38
+"""
 
 import re
 import os
