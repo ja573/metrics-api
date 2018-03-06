@@ -3,7 +3,6 @@
 
 import re
 import os
-import uuid
 import web
 import json
 import psycopg2
