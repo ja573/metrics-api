@@ -1,0 +1,46 @@
+version: "2"
+
+services:
+  db:
+    build: ./db
+    container_name: "readeranalyticsservice_db"
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - db.env
+    networks:
+      local:
+        ipv4_address: 172.20.0.2
+
+  api:
+    build: ./api
+    container_name: "readeranalyticsservice_api"
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - api:/usr/src/app
+    environment:
+      - POSTGRES_HOST=db
+      - API_DEBUG=True
+    env_file:
+      - db.env
+    depends_on:
+      - db
+    networks:
+      local:
+        ipv4_address: 172.20.0.3
+
+volumes:
+  db:
+  api:
+
+networks:
+  local:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.0.0/24
+
