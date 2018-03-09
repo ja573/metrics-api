@@ -41,12 +41,12 @@ CREATE TABLE measure(
 );
 
 CREATE TABLE event(
-  id varchar(255) NOT NULL,
+  uri text NOT NULL,
   measure_id varchar(255) NOT NULL REFERENCES measure(measure_id),
   timestamp timestamp with time zone NOT NULL,
   value integer NOT NULL,
   country_code char(2) NOT NULL REFERENCES country(country_code),
   uploader_id integer NOT NULL REFERENCES uploader(uploader_id),
-  PRIMARY KEY(id, measure_id, timestamp, country_code)
+  PRIMARY KEY(uri, measure_id, timestamp, country_code)
 );
 
