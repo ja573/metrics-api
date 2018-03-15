@@ -1,0 +1,7 @@
+#!/bin/bash
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "obp-html@readership.operas.eu", "value": 3, "timestamp": "2018-03-05T00:00:00+0000", "country": "FR", "uploader": 1}' http://0.0.0.0:8080/metrics
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "obp-html@readership.operas.eu", "value": 15, "timestamp": "2018-03-05T00:00:00+0000", "country": "GB", "uploader": 1}' http://0.0.0.0:8080/metrics
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "obp-html@readership.operas.eu", "value": 1, "timestamp": "2018-03-05T00:00:00+0000", "country": "ES", "uploader": 1}' http://0.0.0.0:8080/metrics
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "obp-pdf@readership.operas.eu", "value": 20, "timestamp": "2018-03-05T00:00:00+0000", "country": "GB", "uploader": 1}' http://0.0.0.0:8080/metrics
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "obp-pdf@readership.operas.eu", "value": 32, "timestamp": "2018-03-05T00:00:00+0000", "country": "GR", "uploader": 1}' http://0.0.0.0:8080/metrics
+curl -i -H "Content-Type: application/json" -X POST -d '{"obj_uri": "info:doi:10.11647/OBP.0001", "measure": "google-books@readership.operas.eu", "value": 112, "timestamp": "2018-02-01T00:00:00+0000", "country": "--", "uploader": 1}' http://0.0.0.0:8080/metrics
