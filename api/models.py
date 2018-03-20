@@ -22,7 +22,7 @@ class Event(object):
             success = connection.commit()
             c.close()
             return success
-        except Exception as error:
+        except (Exception, psycopg2.DatabaseError) as error:
             logging.debug(error)
             raise NotFound()
         finally:
@@ -37,7 +37,7 @@ class Event(object):
             result = c.fetchall()
             c.close()
             return result
-        except Exception as error:
+        except (Exception, psycopg2.DatabaseError) as error:
             logging.debug(error)
             raise NotFound()
         finally:
