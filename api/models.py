@@ -23,7 +23,7 @@ class Event(object):
             c.close()
             return success
         except (Exception, psycopg2.DatabaseError) as error:
-            logging.debug(error)
+            logging.error(error)
             raise NotFound()
         finally:
             if c is not None:
@@ -38,7 +38,7 @@ class Event(object):
             c.close()
             return result
         except (Exception, psycopg2.DatabaseError) as error:
-            logging.debug(error)
+            logging.error(error)
             raise NotFound()
         finally:
             if c is not None:
