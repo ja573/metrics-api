@@ -1,3 +1,7 @@
+import logging
+import psycopg2
+from errors import NotFound, NotAllowed
+
 class Event(object):
     def __init__(self, object_uri, measure, timestamp, value, country, uploader):
         self.object_uri = str(object_uri)
@@ -18,8 +22,12 @@ class Event(object):
             success = connection.commit()
             c.close()
             return success
-        except:
+        except Exception as error:
+            logging.debug(error)
             raise NotFound()
+        finally:
+            if c is not None:
+                c.close()
 
     @staticmethod
     def get_events(connection, key):
@@ -29,5 +37,9 @@ class Event(object):
             result = c.fetchall()
             c.close()
             return result
-        except KeyError:
+        except Exception as error:
+            logging.debug(error)
             raise NotFound()
+        finally:
+            if c is not None:
+                c.close()
