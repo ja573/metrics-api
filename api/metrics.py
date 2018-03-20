@@ -21,6 +21,7 @@ import json
 import psycopg2
 from models import Event
 from dateutil import parser
+from errors import NotFound, NotAllowed
 
 # uniformly receive all database output in Unicode
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
@@ -49,6 +50,7 @@ def api_response(fn):
         if count > 0:
             return {'status': 'ok', 'count': count, 'data': data}
         else:
+            logger.debug("No output data")
             raise NotFound()
     return response
 
@@ -59,34 +61,6 @@ def json_response(fn):
         return json.dumps(fn(self, *args, **kw))
     return response
 
-class NotFound(web.HTTPError):
-    """404 JSON Error"""
-    def __init__(self):
-        status = '404 Not Found'
-        headers = {'Content-Type': 'application/json'}
-        data = json.dumps({'status': 'error', 'count': 0, 'data': 'Not found'})
-        web.HTTPError.__init__(self, status, headers, data)
-
-    def GET(self, name):
-        raise NotFound()
-
-    def POST(self, name):
-        raise NotAllowed()
-
-    def PUT(self, name):
-        raise NotAllowed()
-
-    def DELETE(self, name):
-        raise NotAllowed()
-
-class NotAllowed(web.HTTPError):
-    """405 JSON Error"""
-    def __init__(self):
-        status = '405 Method Not Allowed'
-        headers = {'Content-Type': 'application/json'}
-        data = json.dumps({'status': 'error','count': 0,'data': 'Not Allowed'})
-        web.HTTPError.__init__(self, status, headers, data)
-
 class RequestBroker(object):
     """Handles HTTP requests"""
 
@@ -94,7 +68,7 @@ class RequestBroker(object):
     @api_response
     def GET(self, name):
         """Get Events for a given object ID"""
-        logger.debug("Request: '%s' \n Query: %s" % (name, web.input()))
+        logger.debug("Request: '%s'; Query: %s" % (name, web.input()))
 
         obj_uri = web.input().get('obj_uri')
         try:
@@ -125,7 +99,8 @@ class RequestBroker(object):
         try:
             assert obj_uri and measure and timestamp \
                    and value and country and uploader
-        except AssertionError:
+        except AssertionError as error:
+            logger.debug(error)
             logger.debug("Invalid parameters provided: %s" % (web.data()))
             raise NotFound()
 
@@ -154,10 +129,8 @@ class MetricsDB(RequestBroker):
                    (self.dbname, self.user, self.host, self.passwd)
         try:
             return psycopg2.connect(dbconfig)
-        except:
-            msg = "Could not connect to database %s on host %s" % \
-                  (self.dbname, self.host)
-            logger.error(msg)
+        except psycopg2.OperationalError as error:
+            logger.error(error)
             raise
 
     def get_obj_events(self, key):
@@ -165,6 +138,7 @@ class MetricsDB(RequestBroker):
         if result is not None:
             return result
         else:
+            logger.debug("No data for URI: %s" % (key))
             raise NotFound()
 
     def save_event(self, event):
