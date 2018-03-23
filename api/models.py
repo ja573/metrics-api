@@ -3,8 +3,8 @@ import psycopg2
 from errors import NotFound, NotAllowed
 
 class Event(object):
-    def __init__(self, object_uri, measure, timestamp, value, country, uploader):
-        self.object_uri = str(object_uri)
+    def __init__(self, uri, measure, timestamp, value, country, uploader):
+        self.URI       = str(uri)
         self.measure   = str(measure)
         self.timestamp = timestamp.strftime('%Y-%m-%dT%H:%M:%S%z')
         self.value     = int(value)
@@ -17,7 +17,7 @@ class Event(object):
             c.execute('''INSERT INTO event (uri, measure_id, timestamp,
                                             country_code, value, uploader_id)
                          VALUES (%s, %s, %s, %s, %s, %s);''', \
-                      (self.object_uri, self.measure, self.timestamp, \
+                      (self.URI, self.measure, self.timestamp, \
                        self.country, self.value, self.uploader))
             success = connection.commit()
             c.close()

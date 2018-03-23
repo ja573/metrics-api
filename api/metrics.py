@@ -70,14 +70,14 @@ class RequestBroker(object):
         """Get Events for a given object ID"""
         logger.debug("Request: '%s'; Query: %s" % (name, web.input()))
 
-        obj_uri = web.input().get('obj_uri')
+        uri = web.input().get('uri') or web.input().get('URI')
         try:
-            assert obj_uri
+            assert uri
         except AssertionError:
-            logger.debug("Invalid obj_uri provided")
+            logger.debug("Invalid URI provided")
             raise NotFound()
 
-        results = self.get_obj_events(obj_uri)
+        results = self.get_obj_events(uri)
         data = []
         for e in results:
             event = Event(e[0], e[1], e[2], e[3], e[4], e[5])
@@ -89,7 +89,7 @@ class RequestBroker(object):
     def POST(self, name=None):
         """Create a new event"""
         data      = json.loads(web.data())
-        obj_uri   = data.get('obj_uri')
+        uri       = data.get('uri')
         measure   = data.get('measure')
         value     = data.get('value')
         country   = data.get('country')
@@ -97,7 +97,7 @@ class RequestBroker(object):
         timestamp = parser.parse(data.get('timestamp'))
 
         try:
-            assert obj_uri and measure and timestamp \
+            assert uri and measure and timestamp \
                    and value and country and uploader
         except AssertionError as error:
             logger.debug(error)
@@ -105,7 +105,7 @@ class RequestBroker(object):
             raise NotFound()
 
         try:
-            event = Event(obj_uri, measure, timestamp, value, country, uploader)
+            event = Event(uri, measure, timestamp, value, country, uploader)
             self.save_event(event)
             return "Metrics submitted."
         except:
