@@ -1,7 +1,8 @@
-INSERT INTO namespace (domain_name, definition_url) VALUES
-('readership.operas.eu', 'https://operas.eu/about-metrics/'),
-('downloads.operas.eu', 'https://operas.eu/about-metrics/'),
-('readership.openbookpublishers.com', 'https://www.openbookpublishers.com/section/84'),
-('downloads.openbookpublishers.com', 'https://www.openbookpublishers.com/section/84')
+INSERT INTO namespace (namespace, definition_url) VALUES
+('tag:operas.eu,2018:readership', 'https://operas.eu/about-metrics#readership'),
+('tag:operas.eu,2018:downloads', 'https://operas.eu/about-metrics#downloads'),
+('tag:openbookpublishers.com,2009:readership', 'https://www.openbookpublishers.com/section/84'),
+('tag:openbookpublishers.com,2009:downloads', 'https://www.openbookpublishers.com/section/84'),
+('tag:openbookpublishers.com,2009:sales', 'https://www.openbookpublishers.com/section/84')
 ;
 

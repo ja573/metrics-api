@@ -1,5 +1,5 @@
-INSERT INTO namespace_uploader (domain_name, uploader_id) VALUES
-('readership.openbookpublishers.com', (SELECT uploader_id FROM uploader WHERE uploader_name = 'Open Book Publishers')),
-('downloads.openbookpublishers.com', (SELECT uploader_id FROM uploader WHERE uploader_name = 'Open Book Publishers')),
-('readership.operas.eu', (SELECT uploader_id FROM uploader WHERE uploader_name = 'Open Book Publishers')),
-('downloads.operas.eu', (SELECT uploader_id FROM uploader WHERE uploader_name = 'Open Book Publishers'));
+INSERT INTO namespace_uploader (namespace, uploader_id) VALUES
+('tag:openbookpublishers.com,2009:readership', 'acct:metrics-bot@openbookpublishers.com'),
+('tag:openbookpublishers.com,2009:downloads', 'acct:metrics-bot@openbookpublishers.com'),
+('tag:operas.eu,2018:readership', 'acct:metrics-bot@openbookpublishers.com'),
+('tag:operas.eu,2018:downloads', 'acct:metrics-bot@openbookpublishers.com');

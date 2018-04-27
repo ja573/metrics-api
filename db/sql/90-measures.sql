@@ -1,6 +1,6 @@
-INSERT INTO measure (measure_id, domain_name, source_name, type_name) VALUES
-('obp-html@readership.operas.eu', 'readership.operas.eu', 'Open Book Publishers HTML Reader', 'Book Session'),
-('obp-pdf@readership.operas.eu', 'readership.operas.eu', 'Open Book Publishers PDF Reader', 'Book Session'),
-('obp-downloads@downloads.operas.eu', 'downloads.operas.eu', 'Open Book Publishers Downloads', 'Book Download'),
-('google-books@readership.operas.eu', 'readership.operas.eu', 'Google Books', 'Book Visit');
-
+INSERT INTO measure (measure_id, namespace, source_name, type_name) VALUES
+('tag:operas.eu,2018:readership:obp-html', 'tag:operas.eu,2018:readership', 'Open Book Publishers HTML Reader', 'Book Session'),
+('tag:operas.eu,2018:readership:obp-pdf', 'tag:operas.eu,2018:readership', 'Open Book Publishers PDF Reader', 'Book Session'),
+('tag:operas.eu,2018:downloads:obp-downloads', 'tag:operas.eu,2018:downloads', 'Open Book Publishers', 'Book Download'),
+('tag:operas.eu,2018:readership:google-books', 'tag:operas.eu,2018:readership', 'Google Books', 'Book Visit'),
+('tag:openbookpublishers.com,2009:sales:google-books', 'tag:openbookpublishers.com,2009:sales', 'Google Books', 'Book Sale');
