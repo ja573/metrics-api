@@ -80,7 +80,7 @@ class RequestBroker(object):
         results = self.get_obj_events(uri)
         data = []
         for e in results:
-            event = Event(e[0], e[1], e[2], e[3], e[4], e[5])
+            event = Event(e[0], e[1], e[2], e[3], e[4], e[5], e[6])
             data.append(event.__dict__)
         return data
 
@@ -97,15 +97,15 @@ class RequestBroker(object):
         timestamp = parser.parse(data.get('timestamp'))
 
         try:
-            assert uri and measure and timestamp \
-                   and value and country and uploader
+            assert uri and measure and timestamp and value and uploader
         except AssertionError as error:
             logger.debug(error)
             logger.debug("Invalid parameters provided: %s" % (web.data()))
             raise NotFound()
 
         try:
-            event = Event(uri, measure, timestamp, value, country, uploader)
+            event = Event(None, uri, measure, timestamp, value,
+                          country, uploader)
             self.save_event(event)
             return "Metrics submitted."
         except:
