@@ -36,4 +36,8 @@ volumes:
 
 networks:
   statistics_collection:
-    external: true
+    name: "statistics_collection"
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.0.0/24
