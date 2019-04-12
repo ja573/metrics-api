@@ -14,14 +14,15 @@ Dependencies:
   web.py==0.38
 """
 
-import re
 import os
 import web
 import json
 import psycopg2
 from models import Event
-from dateutil import parser
+
 from errors import NotFound, NotAllowed
+from logic import save_new_entry
+from models import database_handle
 
 # uniformly receive all database output in Unicode
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
@@ -46,7 +47,7 @@ def api_response(fn):
     """Decorator to provided consistency in all responses"""
     def response(self, *args, **kw):
         data  = fn(self, *args, **kw)
-        count = len(data)
+        count = len(data) if data else 0
         if count > 0:
             return {'status': 'ok', 'count': count, 'data': data}
         else:
@@ -88,28 +89,8 @@ class RequestBroker(object):
     @api_response
     def POST(self, name=None):
         """Create a new event"""
-        data      = json.loads(web.data())
-        uri       = data.get('uri')
-        measure   = data.get('measure')
-        value     = data.get('value')
-        country   = data.get('country')
-        uploader  = data.get('uploader')
-        timestamp = parser.parse(data.get('timestamp'))
-
-        try:
-            assert uri and measure and timestamp and value and uploader
-        except AssertionError as error:
-            logger.debug(error)
-            logger.debug("Invalid parameters provided: %s" % (web.data()))
-            raise NotFound()
-
-        try:
-            event = Event(None, uri, measure, timestamp, value,
-                          country, uploader)
-            self.save_event(event)
-            return "Metrics submitted."
-        except:
-            raise NotFound()
+        data = json.loads(web.data())
+        return save_new_entry(data)
 
     def PUT(self, name):
         raise NotAllowed()
@@ -117,35 +98,18 @@ class RequestBroker(object):
     def DELETE(self, name):
         raise NotAllowed()
 
+
 class MetricsDB(RequestBroker):
     """PostgesDB handler."""
-    host     = os.environ['POSTGRES_HOST']
-    dbname   = os.environ['POSTGRES_DB']
-    user     = os.environ['POSTGRES_USER']
-    passwd   = os.environ['POSTGRES_PASSWORD']
-
-    def database_handle(self):
-        dbconfig = "dbname='%s' user='%s' host='%s' password='%s'" % \
-                   (self.dbname, self.user, self.host, self.passwd)
-        try:
-            return psycopg2.connect(dbconfig)
-        except psycopg2.OperationalError as error:
-            logger.error(error)
-            raise
 
     def get_obj_events(self, key):
-        result = Event.get_events(self.database_handle(), str(key))
+        result = Event.get_events(str(key))
         if result is not None:
             return result
         else:
             logger.debug("No data for URI: %s" % (key))
             raise NotFound()
 
-    def save_event(self, event):
-        try:
-            return event.save(self.database_handle())
-        except:
-            raise NotFound()
 
 if __name__ == "__main__":
     logger.info("Starting API...")
