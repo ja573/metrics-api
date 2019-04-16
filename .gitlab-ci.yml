@@ -63,8 +63,10 @@ helm:
     - helm package kubernetes/$HELM_PROJECT_NAME/helm/$HELM_PROJECT_NAME
     - helm s3 push --force /ubiquitypress/$IMAGE_NAME/$HELM_PROJECT_NAME-$CHART_VERSION.tgz ubiquity
     - cd kubernetes/
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git commit -am 'auto update helm chart'
-    - git push origin master
+    - git push https://${GITLAB_USER_NAME}:${GITLAB_ACCESS_TOKEN}@gitlab.com/ubiquitypress/kubernetes.git HEAD:master
   only:
     - tags
 
