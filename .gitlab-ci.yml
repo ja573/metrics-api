@@ -13,6 +13,7 @@ variables:
 
 stages:
   - version
+  - sentry
   - 📦 docker
   - helm
   - flake
@@ -24,6 +25,17 @@ version:
   artifacts:
     paths:
     - variables
+
+sentry:
+  stage: sentry
+  script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
+  artifacts:
+    paths:
+    - kubernetes/
+  only:
+    - tags
+
 
 build-push-clean:
   stage: 📦 docker
