@@ -14,6 +14,6 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 RUN pip install --no-cache-dir -r requirements.txt && \
     rm requirements.txt
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT  ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
