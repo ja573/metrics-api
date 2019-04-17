@@ -1,3 +1,4 @@
+nameko==2.11.0
 python-dateutil==2.4.2
 psycopg2==2.7.5
 web.py==0.38
