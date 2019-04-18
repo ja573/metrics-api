@@ -37,11 +37,9 @@ class Event(object):
         self.country   = str(country) if country else None
         self.uploader  = str(uploader)
 
-        self.connection = database_handle()
-
     def save(self):
         try:
-            c = self.connection.cursor()
+            c = database_handle().cursor()
             statement = (
                 "INSERT INTO event (event_id, uri, measure_id,"
                 "timestamp, country_id, value, uploader_id) VALUES "
@@ -52,7 +50,6 @@ class Event(object):
             )
             c.execute(statement)
             success = self.connection.commit()
-            c.close()
             return success
         except (Exception, psycopg2.DatabaseError) as error:
             logging.error(error)
@@ -61,12 +58,12 @@ class Event(object):
             if c is not None:
                 c.close()
 
-    def get_events(self, key):
+    @staticmethod
+    def get_events(key):
         try:
-            c = self.connection.cursor()
+            c = database_handle().cursor()
             c.execute("SELECT * FROM event WHERE uri = %s;", (key,))
             result = c.fetchall()
-            c.close()
             return result
         except (Exception, psycopg2.DatabaseError) as error:
             logging.error(error)
