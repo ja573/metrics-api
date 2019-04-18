@@ -17,12 +17,12 @@ Dependencies:
 import os
 import web
 import json
+import jwt
 import psycopg2
 from models import Event
 
 from errors import NotFound, NotAllowed
 from logic import save_new_entry
-from models import database_handle
 
 # uniformly receive all database output in Unicode
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
@@ -36,6 +36,8 @@ if debug:
 else:
     logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
+
+jwt_key = os.getenv('JWT_KEY', '')  # Key for decoding JWT
 
 # Define routes
 urls = (
@@ -62,11 +64,35 @@ def json_response(fn):
         return json.dumps(fn(self, *args, **kw))
     return response
 
+
+def get_token_from_header():
+    bearer = web.ctx.env.get('HTTP_AUTHORIZATION', '')
+    return bearer.replace('Bearer ', '')
+
+
+def check_token(fn):  # Use token-checking logic from the translation service.
+    """Decorator to act as middleware, checking authentication token"""
+    def response(self, *args, **kw):
+        token = get_token_from_header()
+        try:
+            jwt.decode(token, jwt_key)
+        except (
+                jwt.exceptions.DecodeError,
+                jwt.ExpiredSignatureError,
+                jwt.InvalidTokenError
+        ) as e:  # TODO: Add more meaningful feedback for each error.
+            logger.error(e)
+            raise NotAllowed
+        return fn(self, *args, **kw)
+    return response
+
+
 class RequestBroker(object):
     """Handles HTTP requests"""
 
     @json_response
     @api_response
+    @check_token
     def GET(self, name):
         """Get Events for a given object ID"""
         logger.debug("Request: '%s'; Query: %s" % (name, web.input()))
@@ -87,6 +113,7 @@ class RequestBroker(object):
 
     @json_response
     @api_response
+    @check_token
     def POST(self, name=None):
         """Create a new event"""
         data = json.loads(web.data())
