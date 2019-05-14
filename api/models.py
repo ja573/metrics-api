@@ -39,7 +39,8 @@ class Event(object):
 
     def save(self):
         try:
-            c = database_handle().cursor()
+            connection = database_handle()
+            c = connection.cursor()
             statement = (
                 "INSERT INTO event (event_id, uri, measure_id,"
                 "timestamp, country_id, value, uploader_id) VALUES "
@@ -49,7 +50,7 @@ class Event(object):
                 )
             )
             c.execute(statement)
-            success = self.connection.commit()
+            success = connection.commit()
             return success
         except (Exception, psycopg2.DatabaseError) as error:
             logging.error(error)
