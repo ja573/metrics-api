@@ -109,6 +109,9 @@ class RequestBroker(object):
         for e in results:
             event = Event(e[0], e[1], e[2], e[3], e[4], e[5], e[6])
             data.append(event.__dict__)
+
+        web.header('Access-Control-Allow-Origin', '*')
+
         return data
 
     @json_response
@@ -124,6 +127,14 @@ class RequestBroker(object):
 
     def DELETE(self, name):
         raise NotAllowed()
+
+    @json_response
+    def OPTIONS(self, name):
+        web.header('Access-Control-Allow-Methods', 'OPTIONS, GET, HEAD')
+        web.header('Access-Control-Allow-Headers', 'authorization')
+        web.header('Access-Control-Allow-Origin', '*')
+
+        return {'status': 'ok'}
 
 
 class MetricsDB(RequestBroker):
