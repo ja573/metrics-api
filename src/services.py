@@ -12,5 +12,9 @@ class NewEventServiceReceiver(object):
 
     @event_handler('metrics_api_service', 'new_entry')
     def save_entry(self, data):
-        save_event(data)
-        logger.info("New altmetrics entry successfully saved.")
+        try:
+            save_event(data, from_nameko=True)
+            logger.info("New altmetrics entry successfully saved.")
+        except BaseException:
+            msg = "[{work_uri}-{event_uri}] - FAILED TO SAVE ALTMETRICS EVENT."
+            logger.error(msg.format(**data))

@@ -28,7 +28,8 @@ class Event(object):
             vals = dict(event_id=self.event_id, work_uri=self.work_uri,
                         measure_uri=self.measure_uri, timestamp=self.timestamp,
                         value=self.value, event_uri=self.event_uri,
-                        country_uri=self.country_uri, uploader=self.uploader)
+                        country_uri=self.country_uri,
+                        uploader_uri=self.uploader_uri)
             db.query(q, vals)
         except (Exception, psycopg2.DatabaseError) as error:
             logger.debug(error)

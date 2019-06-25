@@ -106,8 +106,8 @@ class EventsController(object):
         return
 
 
-def save_event(data):
-    """Store a new event."""
+def save_event(data, from_nameko=False):
+    """Store a new event. Ignore token if the event comes from Nameko."""
     try:
         work_uri = data.get('work_uri')
         measure_uri = data.get('measure_uri')
@@ -115,7 +115,12 @@ def save_event(data):
         value = data.get('value')
         event_uri = data.get('event_uri') or None
         country_uri = data.get('country_uri') or None
-        uploader_uri = get_uploader_from_token()
+
+        if from_nameko:
+            uploader_uri = data.get('uploader_uri')
+        else:
+            uploader_uri = get_uploader_from_token()
+
         if not all([work_uri, measure_uri, timestamp, value, uploader_uri]):
             raise AssertionError
     except BaseException:
