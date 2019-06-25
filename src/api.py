@@ -30,13 +30,12 @@ from errors import (Error, internal_error, not_found, NORESULT, UNAUTHORIZED,
 logger = logger_instance(__name__)
 web.config.debug = debug_mode()
 # You may disable JWT auth. when implementing the API in a local network
-JWT_DISABLED = False
+JWT_DISABLED = os.getenv('JWT_DISABLED').lower() == 'true'
 # Get secret key to check JWT
-SECRET_KEY = os.getnenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 try:
-    if 'JWT_DISABLED' in os.environ:
-        JWT_DISABLED = os.environ['JWT_DISABLED'] in ('true', 'True')
-    assert JWT_DISABLED or SECRET_KEY
+    assert JWT_DISABLED or SECRET_KEY, "Please set JWT_DISABLED or SECRET_KEY"
 except AssertionError as error:
     logger.error(error)
     raise
