@@ -35,3 +35,8 @@ Set up environment
 ==================
 
 $ docker-compose up
+
+Test
+====
+
+$ docker exec -it metrics_api env WEBPY_ENV=test nosetests

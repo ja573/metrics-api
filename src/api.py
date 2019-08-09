@@ -46,6 +46,10 @@ urls = (
     "/measures(/?)", "measuresctrl.MeasuresController"
 )
 
+app = web.application(urls, globals())
+app.internalerror = internal_error
+app.notfound = not_found
+
 try:
     db = web.database(dbn='postgres',
                       host=os.environ['POSTGRES_HOST'],
@@ -210,9 +214,12 @@ def build_date_clause(start_date, end_date):
     return [clause, params]
 
 
+def is_test():
+    if 'WEBPY_ENV' in os.environ:
+        return os.environ['WEBPY_ENV'] == 'test'
+
+
 if __name__ == "__main__":
-    logger.info("Starting API...")
-    app = web.application(urls, globals())
-    app.internalerror = internal_error
-    app.notfound = not_found
-    app.run()
+    if not is_test():
+        logger.info("Starting API...")
+        app.run()

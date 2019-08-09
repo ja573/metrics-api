@@ -5,3 +5,4 @@ psycopg2-binary==2.7.5
 python-dateutil==2.4.2
 web.py==0.39
 nose
+paste
