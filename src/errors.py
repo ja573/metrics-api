@@ -57,9 +57,9 @@ class Error(web.HTTPError):
         httpcode   = self.get_code(level)
         headers    = {'Content-Type': 'application/json'}
         message    = self.get_message(level)
-        try:
+        if web.ctx.env.get('REQUEST_METHOD', '') == 'GET':
             params = web.input()
-        except TypeError:
+        else:
             params = web.data().decode('utf-8')
         output     = json.dumps(
             self.make_output(httpcode, message, msg, params, data))
