@@ -298,7 +298,6 @@ def results_to_measure_aggregation(results):
 def results_to_measure_country_aggregation(results):
     data = []
     countries = []  # temporary list of countries
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -313,17 +312,20 @@ def results_to_measure_country_aggregation(results):
         country = result_to_country(r)
         country.value = r["value"]
         countries.append(country.__dict__)
-        if i == last:
-            measure = result_to_measure(cur)
-            measure.data = countries
-            data.append(measure.__dict__)
+    try:
+        measure = result_to_measure(cur)
+        measure.data = countries
+        data.append(measure.__dict__)
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
 
 
 def results_to_country_measure_aggregation(results):
     data = []
     measures = []  # temporary list of measures
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -338,17 +340,20 @@ def results_to_country_measure_aggregation(results):
         measure = result_to_measure(r)
         measure.value = r["value"]
         measures.append(measure.__dict__)
-        if i == last:
-            country = result_to_country(cur)
-            country.data = measures
-            data.append(country.__dict__)
+    try:
+        country = result_to_country(cur)
+        country.data = measures
+        data.append(country.__dict__)
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
 
 
 def results_to_measure_year_aggregation(results):
     data = []
     years = []  # temporary list of years
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -361,17 +366,20 @@ def results_to_measure_year_aggregation(results):
             years = []
             cur = r
         years.append(dict(year=r["year"], value=r["value"]))
-        if i == last:
-            measure = result_to_measure(cur)
-            measure.data = years
-            data.append(measure.__dict__)
+    try:
+        measure = result_to_measure(cur)
+        measure.data = years
+        data.append(measure.__dict__)
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
 
 
 def results_to_year_measure_aggregation(results):
     data = []
     measures = []  # temporary list of measures
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -384,15 +392,18 @@ def results_to_year_measure_aggregation(results):
         measure = result_to_measure(r)
         measure.value = r["value"]
         measures.append(measure.__dict__)
-        if i == last:
-            data.append(dict(year=cur["year"], data=measures))
+    try:
+        data.append(dict(year=cur["year"], data=measures))
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
 
 
 def results_to_measure_month_aggregation(results):
     data = []
     months = []  # temporary list of months
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -405,17 +416,20 @@ def results_to_measure_month_aggregation(results):
             months = []
             cur = r
         months.append(dict(month=r["month"], value=r["value"]))
-        if i == last:
-            measure = result_to_measure(cur)
-            measure.data = months
-            data.append(measure.__dict__)
+    try:
+        measure = result_to_measure(cur)
+        measure.data = months
+        data.append(measure.__dict__)
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
 
 
 def results_to_month_measure_aggregation(results):
     data = []
     measures = []  # temporary list of measures
-    last = len(results) - 1
 
     for i, r in enumerate(results):
         if i == 0:
@@ -428,6 +442,10 @@ def results_to_month_measure_aggregation(results):
         measure = result_to_measure(r)
         measure.value = r["value"]
         measures.append(measure.__dict__)
-        if i == last:
-            data.append(dict(month=cur["month"], data=measures))
+    try:
+        data.append(dict(month=cur["month"], data=measures))
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
     return data
