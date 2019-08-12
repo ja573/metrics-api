@@ -84,7 +84,7 @@ class EventsController(object):
     @valid_user
     def POST(self, name=None):
         """Create a new event"""
-        data = json.loads(web.data())
+        data = json.loads(web.data().decode('utf-8'))
         return save_event(data)
 
     @json_response
