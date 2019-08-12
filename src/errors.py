@@ -57,7 +57,10 @@ class Error(web.HTTPError):
         httpcode   = self.get_code(level)
         headers    = {'Content-Type': 'application/json'}
         message    = self.get_message(level)
-        params     = web.input() if web.input() else web.data()
+        try:
+            params = web.input()
+        except TypeError:
+            params = web.data().decode('utf-8')
         output     = json.dumps(
             self.make_output(httpcode, message, msg, params, data))
 
