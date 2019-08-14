@@ -3,7 +3,7 @@ import uuid
 from aux import logger_instance, debug_mode
 from api import (json, json_response, api_response, valid_user, build_params,
                  build_date_clause, get_uploader_from_token)
-from errors import Error, NOTALLOWED, BADPARAMS, NORESULT
+from errors import Error, BADPARAMS
 from models.event import Event
 from models.operations import (results_to_events,
                                results_to_measure_aggregation,
@@ -74,9 +74,6 @@ class EventsController():
                 "'measure_uri,year', 'year,measure_uri', 'measure_uri,month', "
                 "'month,measure_uri'"
                 raise Error(BADPARAMS, msg=m)
-
-        if not data:
-            raise Error(NORESULT)
         return data
 
     @json_response
