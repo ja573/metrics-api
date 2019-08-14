@@ -24,26 +24,5 @@ class MeasuresController(object):
         return data
 
     @json_response
-    @api_response
-    @valid_user
-    def POST(self, name):
-        """Create a new measure"""
-        raise Error(NOTALLOWED)
-
-    @json_response
-    @api_response
-    @valid_user
-    def PUT(self, name):
-        """Update an measure"""
-        raise Error(NOTALLOWED)
-
-    @json_response
-    @api_response
-    @valid_user
-    def DELETE(self, name):
-        """Delete an measure"""
-        raise Error(NOTALLOWED)
-
-    @json_response
     def OPTIONS(self, name):
         return

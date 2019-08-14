@@ -88,20 +88,6 @@ class EventsController(object):
         return save_event(data)
 
     @json_response
-    @api_response
-    @valid_user
-    def PUT(self, name):
-        """Update an event"""
-        raise Error(NOTALLOWED)
-
-    @json_response
-    @api_response
-    @valid_user
-    def DELETE(self, name):
-        """Delete an event"""
-        raise Error(NOTALLOWED)
-
-    @json_response
     def OPTIONS(self, name):
         return
 

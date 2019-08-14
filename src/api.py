@@ -23,12 +23,16 @@ import json
 import jwt
 import datetime
 from aux import logger_instance, debug_mode, get_input
-from errors import (Error, internal_error, not_found, NORESULT, UNAUTHORIZED,
-                    FORBIDDEN, BADFILTERS, BADPARAMS)
+from errors import (Error, InternalError, NotFound, NoMethod, NORESULT,
+                    UNAUTHORIZED, FORBIDDEN, BADFILTERS, BADPARAMS)
 
 # get logging interface
 logger = logger_instance(__name__)
 web.config.debug = debug_mode()
+
+# override default 405 method
+web.webapi.nomethod = NoMethod
+
 # You may disable JWT auth. when implementing the API in a local network
 JWT_DISABLED = os.getenv('JWT_DISABLED', 'false').lower() == 'true'
 # Get secret key to check JWT
@@ -214,6 +218,7 @@ def build_date_clause(start_date, end_date):
 if __name__ == "__main__":
     logger.info("Starting API...")
     app = web.application(urls, globals())
-    app.internalerror = internal_error
-    app.notfound = not_found
+    app.internalerror = InternalError
+    app.notfound = NotFound
+    app.nomethod = NoMethod
     app.run()
