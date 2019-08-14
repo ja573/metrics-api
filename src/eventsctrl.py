@@ -25,8 +25,6 @@ class EventsController(object):
     @api_response
     def GET(self, name):
         """Get Events with various filtering options"""
-        logger.debug("Query: %s" % (web.input()))
-
         event_id = web.input().get('event_id')
 
         if event_id:

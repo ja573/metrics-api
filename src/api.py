@@ -22,7 +22,7 @@ import web
 import json
 import jwt
 import datetime
-from aux import logger_instance, debug_mode
+from aux import logger_instance, debug_mode, get_input
 from errors import (Error, internal_error, not_found, NORESULT, UNAUTHORIZED,
                     FORBIDDEN, BADFILTERS, BADPARAMS)
 
@@ -60,6 +60,7 @@ except Exception as error:
 def api_response(fn):
     """Decorator to provided consistency in all responses"""
     def response(self, *args, **kw):
+        logger.debug("Data: %s" % (get_input()))
         data  = fn(self, *args, **kw)
         count = len(data)
         if count > 0:
