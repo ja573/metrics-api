@@ -2,7 +2,8 @@ import web
 from aux import logger_instance, debug_mode
 from api import json_response, api_response, valid_user
 from errors import Error, NOTALLOWED, NORESULT
-from models import Measure, results_to_measures
+from models.measure import Measure
+from models.operations import results_to_measures
 
 logger = logger_instance(__name__)
 web.config.debug = debug_mode()

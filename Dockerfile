@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt && \
 COPY ./config/supervisord.conf /etc/supervisor/supervisord.conf
 COPY ./config/services.yaml /etc/supervisor/services.yaml
 
-COPY ./src/* ./
+ADD ./src/ ./
 
 RUN flake8 --ignore=E221,E241 ./
 
