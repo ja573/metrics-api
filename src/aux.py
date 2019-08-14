@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import web
 import logging
 
 
@@ -21,3 +22,11 @@ def strtolist(data):
         return [data]
     elif isinstance(data, list):
         return data
+
+
+def is_get_request():
+    return web.ctx.env.get('REQUEST_METHOD', '') == 'GET'
+
+
+def get_input():
+    return web.input() if is_get_request() else web.data().decode('utf-8')
