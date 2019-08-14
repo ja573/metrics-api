@@ -288,8 +288,7 @@ def results_to_measures(results, description=False):
 def results_to_measure_aggregation(results):
     data = []
     for r in results:
-        measure = Measure(r["measure_uri"], r["namespace"], r["source"],
-                          r["type"], r["version"])
+        measure = result_to_measure(r)
         measure.value = r["value"]
         data.append(measure.__dict__)
     return data
