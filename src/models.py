@@ -6,7 +6,7 @@ from errors import Error, FATAL
 logger = logger_instance(__name__)
 
 
-class Event(object):
+class Event():
     def __init__(self, event_id, work_uri, measure_uri, timestamp, value,
                  event_uri=None, country_uri=None, uploader_uri=''):
         self.event_id = event_id
@@ -217,7 +217,7 @@ class Event(object):
             raise Error(FATAL)
 
 
-class Measure(object):
+class Measure():
     def __init__(self, measure_uri, namespace, source, mtype, version):
         self.measure_uri = measure_uri
         self.namespace = namespace
@@ -246,7 +246,7 @@ class Measure(object):
             raise Error(FATAL)
 
 
-class Country(object):
+class Country():
     def __init__(self, country_uri, country_code, country_name, continent):
         self.country_uri = country_uri
         self.country_code = country_code
