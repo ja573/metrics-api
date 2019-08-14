@@ -20,7 +20,7 @@ logger = logger_instance(__name__)
 web.config.debug = debug_mode()
 
 
-class EventsController(object):
+class EventsController():
     """Handles work related actions"""
 
     @json_response
