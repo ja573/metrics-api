@@ -24,7 +24,7 @@ import jwt
 import datetime
 from aux import logger_instance, debug_mode, get_input
 from errors import (Error, InternalError, NotFound, NoMethod, NORESULT,
-                    UNAUTHORIZED, FORBIDDEN, BADFILTERS, BADPARAMS)
+                    UNAUTHORIZED, FORBIDDEN, BADFILTERS, BADPARAMS, FATAL)
 
 # get logging interface
 logger = logger_instance(__name__)
