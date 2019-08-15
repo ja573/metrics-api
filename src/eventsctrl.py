@@ -5,14 +5,8 @@ from api import (json, json_response, api_response, valid_user, build_params,
                  build_date_clause, get_uploader_from_token)
 from errors import Error, BADPARAMS
 from models.event import Event
-from models.operations import (results_to_events,
-                               results_to_measure_aggregation,
-                               results_to_measure_country_aggregation,
-                               results_to_country_measure_aggregation,
-                               results_to_measure_year_aggregation,
-                               results_to_year_measure_aggregation,
-                               results_to_measure_month_aggregation,
-                               results_to_month_measure_aggregation)
+from models.aggregation import Aggregation
+from models.operations import results_to_events
 from dateutil import parser
 
 
@@ -43,37 +37,32 @@ class EventsController():
                 clause += dclause
                 params.update(dparams)
 
-            agg = web.input().get('aggregation') or ''
+            agg = web.input().get('aggregation', '')
             if agg == '':
                 results = Event.get_all(clause, params)
                 data = results_to_events(results)
-            elif agg == 'measure_uri':
-                results = Event.aggregate_by_measure(clause, params)
-                data = results_to_measure_aggregation(results)
-            elif agg == 'measure_uri,country_uri':
-                results = Event.aggregate_by_measure_country(clause, params)
-                data = results_to_measure_country_aggregation(results)
-            elif agg == 'country_uri,measure_uri':
-                results = Event.aggregate_by_country_measure(clause, params)
-                data = results_to_country_measure_aggregation(results)
-            elif agg == 'measure_uri,year':
-                results = Event.aggregate_by_measure_year(clause, params)
-                data = results_to_measure_year_aggregation(results)
-            elif agg == 'year,measure_uri':
-                results = Event.aggregate_by_year_measure(clause, params)
-                data = results_to_year_measure_aggregation(results)
-            elif agg == 'measure_uri,month':
-                results = Event.aggregate_by_measure_month(clause, params)
-                data = results_to_measure_month_aggregation(results)
-            elif agg == 'month,measure_uri':
-                results = Event.aggregate_by_month_measure(clause, params)
-                data = results_to_month_measure_aggregation(results)
             else:
-                m = "Aggregation must be one of the following: 'measure_uri', "
-                "'measure_uri,country_uri', 'country_uri,measure_uri', "
-                "'measure_uri,year', 'year,measure_uri', 'measure_uri,month', "
-                "'month,measure_uri'"
-                raise Error(BADPARAMS, msg=m)
+                if agg == 'measure_uri':
+                    r = Event.aggregate_by_measure(clause, params)
+                elif agg == 'measure_uri,country_uri':
+                    r = Event.aggregate_by_measure_country(clause, params)
+                elif agg == 'country_uri,measure_uri':
+                    r = Event.aggregate_by_country_measure(clause, params)
+                elif agg == 'measure_uri,year':
+                    r = Event.aggregate_by_measure_year(clause, params)
+                elif agg == 'year,measure_uri':
+                    r = Event.aggregate_by_year_measure(clause, params)
+                elif agg == 'measure_uri,month':
+                    r = Event.aggregate_by_measure_month(clause, params)
+                elif agg == 'month,measure_uri':
+                    r = Event.aggregate_by_month_measure(clause, params)
+
+                try:
+                    data = Aggregation(agg).aggregate(r)
+                except KeyError:
+                    m = "Aggregation must be one of the following: {}"
+                    raise Error(BADPARAMS,
+                                msg=m.format(Aggregation.list_allowed()))
         return data
 
     @json_response
