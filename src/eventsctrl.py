@@ -37,32 +37,15 @@ class EventsController():
                 clause += dclause
                 params.update(dparams)
 
-            agg = web.input().get('aggregation', '')
-            if agg == '':
-                results = Event.get_all(clause, params)
-                data = results_to_events(results)
-            else:
-                if agg == 'measure_uri':
-                    r = Event.aggregate_by_measure(clause, params)
-                elif agg == 'measure_uri,country_uri':
-                    r = Event.aggregate_by_measure_country(clause, params)
-                elif agg == 'country_uri,measure_uri':
-                    r = Event.aggregate_by_country_measure(clause, params)
-                elif agg == 'measure_uri,year':
-                    r = Event.aggregate_by_measure_year(clause, params)
-                elif agg == 'year,measure_uri':
-                    r = Event.aggregate_by_year_measure(clause, params)
-                elif agg == 'measure_uri,month':
-                    r = Event.aggregate_by_measure_month(clause, params)
-                elif agg == 'month,measure_uri':
-                    r = Event.aggregate_by_month_measure(clause, params)
-
-                try:
-                    data = Aggregation(agg).aggregate(r)
-                except KeyError:
+            criterion = web.input().get('aggregation', '')
+            if not Aggregation.is_allowed(criterion):
                     m = "Aggregation must be one of the following: {}"
                     raise Error(BADPARAMS,
                                 msg=m.format(Aggregation.list_allowed()))
+            aggregation = Aggregation(criterion)
+            aggregation.data = Event.get_for_aggregation(criterion, clause,
+                                                         params)
+            data = aggregation.aggregate()
         return data
 
     @json_response

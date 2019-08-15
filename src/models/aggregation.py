@@ -1,10 +1,14 @@
 from aux import logger_instance
-from .operations import (result_to_country, result_to_measure, result_to_year,
-                         result_to_month)
+from .operations import (result_to_event, result_to_country, result_to_measure,
+                         result_to_year, result_to_month)
 
 logger = logger_instance(__name__)
 
 AGGREGATIONS = {
+    '': {
+        'main_entity': 'event_uri',
+        'main_function': result_to_event
+    },
     'measure_uri': {
         'main_entity': 'measure_uri',
         'main_function': result_to_measure
@@ -51,30 +55,30 @@ class Aggregation():
     def is_unidimensional(self):
         return self.pivot_function is None
 
-    def aggregate(self, data):
-        return (self.unidimensional_aggregation(data)
+    def aggregate(self):
+        return (self.unidimensional_aggregation()
                 if self.is_unidimensional()
-                else self.multidimensional_aggregation(data))
+                else self.multidimensional_aggregation())
 
-    def unidimensional_aggregation(self, data):
+    def unidimensional_aggregation(self):
         output = []
-        for r in data:
+        for r in self.data:
             obj = self.main_function(r)
             obj.value = r["value"]
             output.append(obj.__dict__)
         return output
 
-    def multidimensional_aggregation(self, data):
+    def multidimensional_aggregation(self):
         output = []
         tmp = []
 
-        for i, r in enumerate(data):
+        for i, r in enumerate(self.data):
             if i == 0:
                 # if we do cur=data[0] outsise it moves IterBetter's pointer
                 cur = r
             if r[self.entity] != cur[self.entity]:
                 obj = self.main_function(cur)
-                obj.output = tmp
+                obj.data = tmp
                 output.append(obj.__dict__)
                 tmp = []
                 cur = r
@@ -83,7 +87,7 @@ class Aggregation():
             tmp.append(piv.__dict__)
         try:
             obj = self.main_function(cur)
-            obj.output = tmp
+            obj.data = tmp
             output.append(obj.__dict__)
         except NameError:
             # we need to run the above with the last element of IterBetter,
@@ -94,3 +98,7 @@ class Aggregation():
     @staticmethod
     def list_allowed():
         return ', '.join("'{0}'".format(x) for x in AGGREGATIONS.keys())
+
+    @staticmethod
+    def is_allowed(criterion):
+        return AGGREGATIONS.get(criterion) is not None
