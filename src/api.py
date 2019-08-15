@@ -38,11 +38,10 @@ JWT_DISABLED = os.getenv('JWT_DISABLED', 'false').lower() == 'true'
 # Get secret key to check JWT
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-try:
-    assert JWT_DISABLED or SECRET_KEY, "Please set JWT_DISABLED or SECRET_KEY"
-except AssertionError as error:
-    logger.error(error)
-    raise
+if not JWT_DISABLED and not SECRET_KEY:
+    logger.error("API authentication is not configured. "
+                 "You must set JWT_DISABLED or SECRET_KEY")
+    raise Error(FATAL)
 
 # Define routes
 urls = (
