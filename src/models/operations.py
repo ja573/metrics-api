@@ -28,14 +28,17 @@ def result_to_measure(r, description=False):
     return measure
 
 
+def result_to_date_part(year=None, month=None):
+    from .datepart import Datepart
+    return Datepart(year=year, month=month)
+
+
 def result_to_year(r):
-    from .year import Year
-    return Year(r["year"])
+    return result_to_date_part(year=r["year"])
 
 
 def result_to_month(r):
-    from .month import Month
-    return Month(r["month"])
+    return result_to_date_part(month=r["month"])
 
 
 def results_to_events(results):
