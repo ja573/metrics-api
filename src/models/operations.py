@@ -1,7 +1,7 @@
 import psycopg2
 from api import db
 from aux import logger_instance
-from errors import Error, FATAL
+from errors import Error, FATAL, BADPARAMS
 
 logger = logger_instance(__name__)
 
@@ -28,6 +28,16 @@ def result_to_measure(r, description=False):
     return measure
 
 
+def result_to_year(r):
+    from .year import Year
+    return Year(r["year"])
+
+
+def result_to_month(r):
+    from .month import Month
+    return Month(r["month"])
+
+
 def results_to_events(results):
     return [(result_to_event(e).__dict__) for e in results]
 
@@ -40,169 +50,83 @@ def results_to_measures(results, description=False):
     return [(result_to_measure(e, description).__dict__) for e in results]
 
 
-def results_to_measure_aggregation(results):
+def aggregate(aggregation, results):
+    try:
+        entity = AGGREGATIONS[aggregation].get('main_entity')
+        main_func = AGGREGATIONS[aggregation].get('main_function')
+        pivot_func = AGGREGATIONS[aggregation].get('pivot_function')
+    except KeyError:
+        raise Error(BADPARAMS)
+    if pivot_func is None:
+        return aggregate_single_dimension(entity, main_func, results)
+    else:
+        return aggregate_multiple_dimensions(entity, main_func, pivot_func,
+                                             results)
+
+
+def aggregate_single_dimension(entity, main_func, results):
     data = []
     for r in results:
-        measure = result_to_measure(r)
-        measure.value = r["value"]
-        data.append(measure.__dict__)
+        obj = main_func(r)
+        obj.value = r["value"]
+        data.append(obj.__dict__)
     return data
+
+
+def aggregate_multiple_dimensions(entity, main_func, pivot_func, results):
+    data = []
+    tmp = []
+
+    for i, r in enumerate(results):
+        if i == 0:
+            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
+            cur = r
+        if r[entity] != cur[entity]:
+            obj = main_func(cur)
+            obj.data = tmp
+            data.append(obj.__dict__)
+            tmp = []
+            cur = r
+        piv = pivot_func(r)
+        piv.value = r["value"]
+        tmp.append(piv.__dict__)
+    try:
+        obj = main_func(cur)
+        obj.data = tmp
+        data.append(obj.__dict__)
+    except NameError:
+        # we need to run the above with the last element of IterBetter, if it
+        # fails it means that no results were iterated
+        pass
+    return data
+
+
+def results_to_measure_aggregation(results):
+    return aggregate('measure', results)
 
 
 def results_to_measure_country_aggregation(results):
-    data = []
-    countries = []  # temporary list of countries
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["measure_uri"] != cur["measure_uri"]:
-            measure = result_to_measure(cur)
-            measure.data = countries
-            data.append(measure.__dict__)
-            countries = []
-            cur = r
-        country = result_to_country(r)
-        country.value = r["value"]
-        countries.append(country.__dict__)
-    try:
-        measure = result_to_measure(cur)
-        measure.data = countries
-        data.append(measure.__dict__)
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('measure_country', results)
 
 
 def results_to_country_measure_aggregation(results):
-    data = []
-    measures = []  # temporary list of measures
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["country_uri"] != cur["country_uri"]:
-            country = result_to_country(cur)
-            country.data = measures
-            data.append(country.__dict__)
-            measures = []
-            cur = r
-        measure = result_to_measure(r)
-        measure.value = r["value"]
-        measures.append(measure.__dict__)
-    try:
-        country = result_to_country(cur)
-        country.data = measures
-        data.append(country.__dict__)
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('country_measure', results)
 
 
 def results_to_measure_year_aggregation(results):
-    data = []
-    years = []  # temporary list of years
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["measure_uri"] != cur["measure_uri"]:
-            measure = result_to_measure(cur)
-            measure.data = years
-            data.append(measure.__dict__)
-            years = []
-            cur = r
-        years.append(dict(year=r["year"], value=r["value"]))
-    try:
-        measure = result_to_measure(cur)
-        measure.data = years
-        data.append(measure.__dict__)
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('measure_year', results)
 
 
 def results_to_year_measure_aggregation(results):
-    data = []
-    measures = []  # temporary list of measures
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["year"] != cur["year"]:
-            data.append(dict(year=cur["year"], data=measures))
-            measures = []
-            cur = r
-        measure = result_to_measure(r)
-        measure.value = r["value"]
-        measures.append(measure.__dict__)
-    try:
-        data.append(dict(year=cur["year"], data=measures))
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('year_measure', results)
 
 
 def results_to_measure_month_aggregation(results):
-    data = []
-    months = []  # temporary list of months
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["measure_uri"] != cur["measure_uri"]:
-            measure = result_to_measure(cur)
-            measure.data = months
-            data.append(measure.__dict__)
-            months = []
-            cur = r
-        months.append(dict(month=r["month"], value=r["value"]))
-    try:
-        measure = result_to_measure(cur)
-        measure.data = months
-        data.append(measure.__dict__)
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('measure_month', results)
 
 
 def results_to_month_measure_aggregation(results):
-    data = []
-    measures = []  # temporary list of measures
-
-    for i, r in enumerate(results):
-        if i == 0:
-            # we can't do cur=results[0] outsise--it moves IterBetter's pointer
-            cur = r
-        if r["month"] != cur["month"]:
-            data.append(dict(month=cur["month"], data=measures))
-            measures = []
-            cur = r
-        measure = result_to_measure(r)
-        measure.value = r["value"]
-        measures.append(measure.__dict__)
-    try:
-        data.append(dict(month=cur["month"], data=measures))
-    except NameError:
-        # we need to run the above with the last element of IterBetter, if it
-        # fails it means that no results were iterated
-        pass
-    return data
+    return aggregate('month_measure', results)
 
 
 def do_query(query, params):
@@ -211,3 +135,41 @@ def do_query(query, params):
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
         raise Error(FATAL)
+
+
+AGGREGATIONS = {
+    'measure': {
+        'main_entity': 'measure_uri',
+        'main_function': result_to_measure
+    },
+    'measure_country': {
+        'main_entity': 'measure_uri',
+        'main_function': result_to_measure,
+        'pivot_function': result_to_country
+    },
+    'country_measure': {
+        'main_entity': 'country_uri',
+        'main_function': result_to_country,
+        'pivot_function': result_to_measure
+    },
+    'measure_year': {
+        'main_entity': 'measure_uri',
+        'main_function': result_to_measure,
+        'pivot_function': result_to_year
+    },
+    'year_measure': {
+        'main_entity': 'year',
+        'main_function': result_to_year,
+        'pivot_function': result_to_measure
+    },
+    'measure_month': {
+        'main_entity': 'measure_uri',
+        'main_function': result_to_measure,
+        'pivot_function': result_to_month
+    },
+    'month_measure': {
+        'main_entity': 'month',
+        'main_function': result_to_month,
+        'pivot_function': result_to_measure
+    }
+}
