@@ -4,7 +4,7 @@ from .operations import (result_to_event, result_to_country, result_to_measure,
 
 logger = logger_instance(__name__)
 
-AGGREGATIONS = {
+_AGGREGATIONS = {
     '': {
         'main_entity': 'event_uri',
         'main_function': result_to_event
@@ -48,9 +48,9 @@ AGGREGATIONS = {
 
 class Aggregation():
     def __init__(self, criterion):
-        self.entity = AGGREGATIONS[criterion].get('main_entity')
-        self.main_function = AGGREGATIONS[criterion].get('main_function')
-        self.pivot_function = AGGREGATIONS[criterion].get('pivot_function')
+        self.entity = _AGGREGATIONS[criterion].get('main_entity')
+        self.main_function = _AGGREGATIONS[criterion].get('main_function')
+        self.pivot_function = _AGGREGATIONS[criterion].get('pivot_function')
 
     def is_unidimensional(self):
         return self.pivot_function is None
@@ -97,8 +97,8 @@ class Aggregation():
 
     @staticmethod
     def list_allowed():
-        return ', '.join("'{0}'".format(x) for x in AGGREGATIONS.keys())
+        return ', '.join("'{0}'".format(x) for x in _AGGREGATIONS.keys())
 
     @staticmethod
     def is_allowed(criterion):
-        return AGGREGATIONS.get(criterion) is not None
+        return _AGGREGATIONS.get(criterion) is not None
