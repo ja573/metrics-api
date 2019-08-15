@@ -20,12 +20,7 @@ class Event():
                 VALUES ($event_id, $work_uri, $measure_uri, $timestamp,
                   $value, $event_uri, $country_uri, $uploader_uri)
                 ON CONFLICT DO NOTHING;'''
-        vals = dict(event_id=self.event_id, work_uri=self.work_uri,
-                    measure_uri=self.measure_uri, timestamp=self.timestamp,
-                    value=self.value, event_uri=self.event_uri,
-                    country_uri=self.country_uri,
-                    uploader_uri=self.uploader_uri)
-        do_query(q, vals)
+        do_query(q, self.__dict__)
 
     @staticmethod
     def get_from_event_id(event_id):
