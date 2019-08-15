@@ -51,31 +51,31 @@ class Aggregation():
     def is_unidimensional(self):
         return self.pivot_function is None
 
-    def aggregate(self, results):
-        return (self.unidimensional_aggregation(results)
+    def aggregate(self, data):
+        return (self.unidimensional_aggregation(data)
                 if self.is_unidimensional()
-                else self.multidimensional_aggregation(results))
+                else self.multidimensional_aggregation(data))
 
-    def unidimensional_aggregation(self, results):
-        data = []
-        for r in results:
+    def unidimensional_aggregation(self, data):
+        output = []
+        for r in data:
             obj = self.main_function(r)
             obj.value = r["value"]
-            data.append(obj.__dict__)
-        return data
+            output.append(obj.__dict__)
+        return output
 
-    def multidimensional_aggregation(self, results):
-        data = []
+    def multidimensional_aggregation(self, data):
+        output = []
         tmp = []
 
-        for i, r in enumerate(results):
+        for i, r in enumerate(data):
             if i == 0:
-                # if we do cur=results[0] outsise it moves IterBetter's pointer
+                # if we do cur=data[0] outsise it moves IterBetter's pointer
                 cur = r
             if r[self.entity] != cur[self.entity]:
                 obj = self.main_function(cur)
-                obj.data = tmp
-                data.append(obj.__dict__)
+                obj.output = tmp
+                output.append(obj.__dict__)
                 tmp = []
                 cur = r
             piv = self.pivot_function(r)
@@ -83,13 +83,13 @@ class Aggregation():
             tmp.append(piv.__dict__)
         try:
             obj = self.main_function(cur)
-            obj.data = tmp
-            data.append(obj.__dict__)
+            obj.output = tmp
+            output.append(obj.__dict__)
         except NameError:
             # we need to run the above with the last element of IterBetter,
-            # if it fails it means that no results were iterated
+            # if it fails it means that no data were iterated
             pass
-        return data
+        return output
 
     @staticmethod
     def list_allowed():
