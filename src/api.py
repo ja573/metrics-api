@@ -30,8 +30,19 @@ from errors import (Error, InternalError, NotFound, NoMethod, NORESULT,
 logger = logger_instance(__name__)
 web.config.debug = debug_mode()
 
-# override default 405 method
+# override default http errors
 web.webapi.nomethod = NoMethod
+web.webapi.internalerror = InternalError
+web.webapi.notfound = NotFound
+web.webapi.nomethod = NoMethod
+
+# Define routes
+urls = (
+    "/events(/?)", "eventsctrl.EventsController",
+    "/measures(/?)", "measuresctrl.MeasuresController"
+)
+# Set up application
+app = web.application(urls, globals())
 
 # You may disable JWT auth. when implementing the API in a local network
 JWT_DISABLED = os.getenv('JWT_DISABLED', 'false').lower() == 'true'
@@ -42,12 +53,6 @@ if not JWT_DISABLED and not SECRET_KEY:
     logger.error("API authentication is not configured. "
                  "You must set JWT_DISABLED or SECRET_KEY")
     raise Error(FATAL)
-
-# Define routes
-urls = (
-    "/events(/?)", "eventsctrl.EventsController",
-    "/measures(/?)", "measuresctrl.MeasuresController"
-)
 
 try:
     db = web.database(dbn='postgres',
@@ -214,8 +219,4 @@ def build_date_clause(start_date, end_date):
 
 if __name__ == "__main__":
     logger.info("Starting API...")
-    app = web.application(urls, globals())
-    app.internalerror = InternalError
-    app.notfound = NotFound
-    app.nomethod = NoMethod
     app.run()
