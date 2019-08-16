@@ -1,5 +1,4 @@
-from .operations import do_query
-from .aggregationqueries import AGGREGATION_QUERIES
+from .queries import AGGREGATION_QUERIES, do_query
 
 
 class Event():

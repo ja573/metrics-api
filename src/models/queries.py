@@ -1,3 +1,10 @@
+from api import db
+import psycopg2
+from errors import Error, FATAL
+from aux import logger_instance
+
+logger = logger_instance(__name__)
+
 _GET_ALL = "SELECT * FROM event WHERE 1=1 {} ORDER BY timestamp;"
 _MEASURE = """
     SELECT
@@ -118,3 +125,11 @@ AGGREGATION_QUERIES = {
     'measure_uri,month': _MEASURE_MONTH,
     'month,measure_uri': _MONTH_MEASURE
 }
+
+
+def do_query(query, params):
+    try:
+        return db.query(query, params)
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(error)
+        raise Error(FATAL)
