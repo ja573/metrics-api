@@ -1,5 +1,6 @@
-import web
 import uuid
+from dateutil import parser
+import web
 from aux import logger_instance, debug_mode
 from api import (json, json_response, api_response, valid_user, build_params,
                  build_date_clause, get_uploader_from_token)
@@ -7,8 +8,6 @@ from errors import Error, BADPARAMS
 from models.event import Event
 from models.aggregation import Aggregation
 from models.operations import results_to_events
-from dateutil import parser
-
 
 logger = logger_instance(__name__)
 web.config.debug = debug_mode()

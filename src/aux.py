@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import web
 import logging
+import web
 
 
 def debug_mode():

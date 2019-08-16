@@ -18,10 +18,10 @@ Dependencies:
 
 import re
 import os
-import web
 import json
-import jwt
 import datetime
+import web
+import jwt
 from aux import logger_instance, debug_mode, get_input
 from errors import (Error, InternalError, NotFound, NoMethod, NORESULT,
                     UNAUTHORIZED, FORBIDDEN, BADFILTERS, BADPARAMS, FATAL)
