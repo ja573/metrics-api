@@ -147,16 +147,15 @@ def get_authority_from_token():
 def build_params(filters):
     if not filters:
         return "", {}
-    # split by ',' except those preceeded by a top level domain, which will
-    # be a tag URI scheme (e.g. tag:openbookpublishers.com,2009)
-    params = re.split(r"(?<!\.[a-z]{3}),", filters)
     options = {}
     uris = []
     measures = []
     countries = []
     uploaders = []
     clause = ""
-    for p in params:
+    # split by ',' except those preceeded by a top level domain, which will
+    # be a tag URI scheme (e.g. tag:openbookpublishers.com,2009)
+    for p in re.split(r"(?<!\.[a-z]{3}),", filters):
         try:
             field, val = p.split(':', 1)
             if field == "work_uri":
