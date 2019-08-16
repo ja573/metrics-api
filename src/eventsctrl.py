@@ -39,9 +39,9 @@ class EventsController():
 
             criterion = web.input().get('aggregation', '')
             if not Aggregation.is_allowed(criterion):
-                    m = "Aggregation must be one of the following: {}"
-                    raise Error(BADPARAMS,
-                                msg=m.format(Aggregation.list_allowed()))
+                m = "Aggregation must be one of the following: {}"
+                raise Error(BADPARAMS,
+                            msg=m.format(Aggregation.list_allowed()))
             aggregation = Aggregation(criterion)
             aggregation.data = Event.get_for_aggregation(criterion, clause,
                                                          params)
