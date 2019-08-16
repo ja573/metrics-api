@@ -175,7 +175,7 @@ def build_params(filters):
     process = {"work_uri": uris, "measure_uri": measures,
                "country_uri": countries, "uploader_uri": uploaders}
     for key, values in list(process.items()):
-        if len(values) > 0:
+        if values:
             try:
                 andclause, ops = build_clause(key, values)
                 options.update(ops)
