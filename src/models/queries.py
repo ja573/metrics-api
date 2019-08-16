@@ -127,9 +127,17 @@ AGGREGATION_QUERIES = {
 }
 
 
-def do_query(query, params):
-    try:
-        return db.query(query, params)
-    except (Exception, psycopg2.DatabaseError) as error:
-        logger.error(error)
-        raise Error(FATAL)
+def dbcheck(function):
+    """Decorator to catch database errors"""
+    def response(*args, **kw):
+        try:
+            return function(*args, **kw)
+        except psycopg2.DatabaseError as error:
+            logger.error(error)
+            raise Error(FATAL)
+    return response
+
+
+@dbcheck
+def do_query(query, params={}):
+    return db.query(query, params)

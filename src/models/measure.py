@@ -1,4 +1,5 @@
 from api import db
+from .queries import do_query, dbcheck
 
 
 class Measure():
@@ -19,8 +20,9 @@ class Measure():
                FROM measure_description INNER JOIN locale USING(locale_code)
                WHERE measure_uri = $uri
                ORDER BY locale_code;'''
-        return db.query(q, options)
+        return do_query(q, options)
 
     @staticmethod
+    @dbcheck
     def get_all():
         return db.select('measure')
