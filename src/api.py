@@ -18,7 +18,9 @@ Dependencies:
 
 import os
 import json
+import sys
 import web
+import psycopg2
 from aux import logger_instance, debug_mode, get_input
 from errors import Error, InternalError, NotFound, NoMethod, NORESULT
 
@@ -40,15 +42,17 @@ urls = (
 app = web.application(urls, globals())
 app.internalerror = InternalError
 
+# Set up database connection and test it
+db = web.database(dbn='postgres',
+                  host=os.environ['POSTGRES_HOST'],
+                  user=os.environ['POSTGRES_USER'],
+                  pw=os.environ['POSTGRES_PASSWORD'],
+                  db=os.environ['POSTGRES_DB'])
 try:
-    db = web.database(dbn='postgres',
-                      host=os.environ['POSTGRES_HOST'],
-                      user=os.environ['POSTGRES_USER'],
-                      pw=os.environ['POSTGRES_PASSWORD'],
-                      db=os.environ['POSTGRES_DB'])
-except Exception as error:
+    db._connect(db.keywords)
+except psycopg2.DatabaseError as error:
     logger.error(error)
-    raise
+    sys.exit(1)
 
 
 def api_response(fn):
