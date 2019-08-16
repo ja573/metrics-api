@@ -13,7 +13,7 @@ COPY ./config/services.yaml /etc/supervisor/services.yaml
 
 ADD ./src/ ./
 
-RUN flake8 --ignore=E221,E241 ./
+RUN flake8 ./
 
 EXPOSE 8080
 

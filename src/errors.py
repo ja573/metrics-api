@@ -3,16 +3,16 @@ import json
 from aux import get_input
 
 
-NOTFOUND     = 10
-NOTALLOWED   = 20
-BADPARAMS    = 30
-BADFILTERS   = 40
-NORESULT     = 50
-FATAL        = 60
+NOTFOUND = 10
+NOTALLOWED = 20
+BADPARAMS = 30
+BADFILTERS = 40
+NORESULT = 50
+FATAL = 60
 UNAUTHORIZED = 70
-FORBIDDEN    = 80
-BADAUTH      = 90
-DEFAULT      = NOTFOUND
+FORBIDDEN = 80
+BADAUTH = 90
+DEFAULT = NOTFOUND
 
 _level_messages = {
     NOTFOUND:     'Not Found.',

@@ -64,7 +64,7 @@ def api_response(fn):
     """Decorator to provided consistency in all responses"""
     def response(self, *args, **kw):
         logger.debug("Data: %s" % (get_input()))
-        data  = fn(self, *args, **kw)
+        data = fn(self, *args, **kw)
         count = len(data)
         if count > 0:
             return {'status': 'ok', 'code': 200, 'count': count, 'data': data}
@@ -150,13 +150,13 @@ def build_params(filters):
         return "", {}
     # split by ',' except those preceeded by a top level domain, which will
     # be a tag URI scheme (e.g. tag:openbookpublishers.com,2009)
-    params    = re.split(r"(?<!\.[a-z]{3}),", filters)
-    options   = {}
-    uris      = []
-    measures  = []
+    params = re.split(r"(?<!\.[a-z]{3}),", filters)
+    options = {}
+    uris = []
+    measures = []
     countries = []
     uploaders = []
-    clause  = ""
+    clause = ""
     for p in params:
         try:
             field, val = p.split(':', 1)
