@@ -22,7 +22,7 @@ class Measure():
                ORDER BY locale_code;'''
         return do_query(q, options)
 
-    @staticmethod
     @dbcheck
+    @staticmethod
     def get_all():
         return db.select('measure')
