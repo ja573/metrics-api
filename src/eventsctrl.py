@@ -2,8 +2,9 @@ import uuid
 from dateutil import parser
 import web
 from aux import logger_instance, debug_mode
-from api import (json, json_response, api_response, valid_user, build_params,
-                 build_date_clause, get_uploader_from_token)
+from api import json, json_response, api_response
+from auth import valid_user, get_uploader_from_token
+from validation import build_params, build_date_clause
 from errors import Error, BADPARAMS
 from models.event import Event
 from models.aggregation import Aggregation

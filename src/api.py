@@ -16,15 +16,11 @@ Dependencies:
   web.py==0.40-dev1
 """
 
-import re
 import os
 import json
-import datetime
 import web
-import jwt
 from aux import logger_instance, debug_mode, get_input
-from errors import (Error, InternalError, NotFound, NoMethod, NORESULT,
-                    UNAUTHORIZED, FORBIDDEN, BADFILTERS, BADPARAMS, FATAL)
+from errors import Error, InternalError, NotFound, NoMethod, NORESULT
 
 # get logging interface
 logger = logger_instance(__name__)
@@ -43,16 +39,6 @@ urls = (
 )
 # Set up application
 app = web.application(urls, globals())
-
-# You may disable JWT auth. when implementing the API in a local network
-JWT_DISABLED = os.getenv('JWT_DISABLED', 'false').lower() == 'true'
-# Get secret key to check JWT
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-if not JWT_DISABLED and not SECRET_KEY:
-    logger.error("API authentication is not configured. "
-                 "You must set JWT_DISABLED or SECRET_KEY")
-    raise Error(FATAL)
 
 try:
     db = web.database(dbn='postgres',
@@ -89,132 +75,6 @@ def json_response(fn):
                    'X-Requested-With, Content-Type, Accept')
         return json.dumps(fn(self, *args, **kw), ensure_ascii=False)
     return response
-
-
-def get_token_from_header():
-    bearer = web.ctx.env.get('HTTP_AUTHORIZATION', '')
-    return bearer.replace("Bearer ", "") if bearer else ""
-
-
-def decode_token(intoken):
-    try:
-        return jwt.decode(intoken, SECRET_KEY)
-    except jwt.exceptions.DecodeError:
-        raise Error(FORBIDDEN)
-    except jwt.ExpiredSignatureError:
-        raise Error(UNAUTHORIZED, msg="Signature expired.")
-    except jwt.InvalidTokenError:
-        raise Error(UNAUTHORIZED, msg="Invalid token.")
-
-
-def valid_user(fn):
-    """Decorator to act as middleware, checking token"""
-    def response(self, *args, **kw):
-        if not is_user() and not is_admin():
-            raise Error(UNAUTHORIZED, msg="You lack write rights.")
-        return fn(self, *args, **kw)
-    return response
-
-
-def admin_user(fn):
-    """Decorator to act as middleware, checking token for admin rights"""
-    def response(self, *args, **kw):
-        if not is_admin():
-            raise Error(UNAUTHORIZED, msg="You lack admin rights.")
-        return fn(self, *args, **kw)
-    return response
-
-
-def check_token(fn):
-    """Decorator to act as middleware, checking authentication token"""
-    def response(self, *args, **kw):
-        if decode_token(get_token_from_header()):
-            return fn(self, *args, **kw)
-    return response
-
-
-def is_admin():
-    return get_authority_from_token() == 'admin'
-
-
-def is_user():
-    return get_authority_from_token() == 'user'
-
-
-def get_uploader_from_token():
-    return decode_token(get_token_from_header())['sub']
-
-
-def get_authority_from_token():
-    return decode_token(get_token_from_header())['authority']
-
-
-def build_params(filters):
-    if not filters:
-        return "", {}
-    options = {}
-    uris = []
-    measures = []
-    countries = []
-    uploaders = []
-    clause = ""
-    # split by ',' except those preceeded by a top level domain, which will
-    # be a tag URI scheme (e.g. tag:openbookpublishers.com,2009)
-    for p in re.split(r"(?<!\.[a-z]{3}),", filters):
-        try:
-            field, val = p.split(':', 1)
-            if field == "work_uri":
-                uris.append(val)
-            elif field == "measure_uri":
-                measures.append(val)
-            elif field == "country_uri":
-                countries.append(val)
-            elif field == "uploader_uri":
-                uploaders.append(val)
-            else:
-                raise Error(BADFILTERS)
-        except BaseException:
-            raise Error(BADFILTERS, msg="Unknown filter '%s'" % (p))
-
-    process = {"work_uri": uris, "measure_uri": measures,
-               "country_uri": countries, "uploader_uri": uploaders}
-    for key, values in list(process.items()):
-        if values:
-            try:
-                andclause, ops = build_clause(key, values)
-                options.update(ops)
-                clause = clause + andclause
-            except BaseException:
-                raise Error(BADFILTERS)
-
-    return clause, options
-
-
-def build_clause(attribute, values):
-    params = {}
-    clause = " AND " + attribute + " IN ("
-    no = 1
-    for v in values:
-        params[attribute + str(no)] = v
-        if no > 1:
-            clause += ","
-        clause += "$" + attribute + str(no)
-        no += 1
-    return [clause + ")", params]
-
-
-def build_date_clause(start_date, end_date):
-    if not end_date:
-        end_date = datetime.date.today().strftime("%Y-%m-%d")
-    try:
-        datetime.datetime.strptime(start_date, '%Y-%m-%d')
-        datetime.datetime.strptime(end_date, '%Y-%m-%d')
-    except ValueError:
-        msg = "start_date and end_date must be in YYYY-MM-DD format"
-        raise Error(BADPARAMS, msg=msg)
-    clause = " AND timestamp BETWEEN $start_date AND $end_date"
-    params = {'start_date': start_date, 'end_date': end_date}
-    return [clause, params]
 
 
 if __name__ == "__main__":
