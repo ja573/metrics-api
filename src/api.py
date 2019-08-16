@@ -30,7 +30,6 @@ web.config.debug = debug_mode()
 web.webapi.nomethod = NoMethod
 web.webapi.internalerror = InternalError
 web.webapi.notfound = NotFound
-web.webapi.nomethod = NoMethod
 
 # Define routes
 urls = (
@@ -39,6 +38,7 @@ urls = (
 )
 # Set up application
 app = web.application(urls, globals())
+app.internalerror = InternalError
 
 try:
     db = web.database(dbn='postgres',
