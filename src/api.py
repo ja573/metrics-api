@@ -66,10 +66,9 @@ def api_response(fn):
         logger.debug("Data: %s" % (get_input()))
         data = fn(self, *args, **kw)
         count = len(data)
-        if data:
-            return {'status': 'ok', 'code': 200, 'count': count, 'data': data}
-        else:
+        if not data:
             raise Error(NORESULT)
+        return {'status': 'ok', 'code': 200, 'count': count, 'data': data}
     return response
 
 
