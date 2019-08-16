@@ -14,7 +14,7 @@ FORBIDDEN = 80
 BADAUTH = 90
 DEFAULT = NOTFOUND
 
-_level_messages = {
+_LEVEL_MESSAGES = {
     NOTFOUND:     'Not Found.',
     NOTALLOWED:   'Not Allowed.',
     BADPARAMS:    'Invalid parameters provided.',
@@ -26,7 +26,7 @@ _level_messages = {
     BADAUTH:      'Wrong credentials provided.'
 }
 
-_level_statuses = {
+_LEVEL_STATUSES = {
     NOTFOUND:     '404 Not Found',
     NOTALLOWED:   '405 Method Not Allowed',
     BADPARAMS:    '400 Bad Request',
@@ -38,7 +38,7 @@ _level_statuses = {
     BADAUTH:      '401 Unauthorized'
 }
 
-_level_codes = {
+_LEVEL_CODES = {
     NOTFOUND:     404,
     NOTALLOWED:   405,
     BADPARAMS:    400,
@@ -66,13 +66,13 @@ class Error(web.HTTPError):
         web.HTTPError.__init__(self, self.httpstatus, self.headers, output)
 
     def get_status(self, level):
-        return _level_statuses.get(level)
+        return _LEVEL_STATUSES.get(level)
 
     def get_code(self, level):
-        return _level_codes.get(level)
+        return _LEVEL_CODES.get(level)
 
     def get_message(self, level):
-        return _level_messages.get(level)
+        return _LEVEL_MESSAGES.get(level)
 
     def make_output(self, data):
         return json.dumps({
