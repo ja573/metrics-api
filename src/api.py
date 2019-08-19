@@ -21,7 +21,7 @@ import json
 import sys
 import web
 import psycopg2
-from aux import logger_instance, debug_mode, get_input
+from aux import logger_instance, debug_mode, test_mode, get_input
 from errors import Error, InternalError, NotFound, NoMethod, NORESULT
 
 # get logging interface
@@ -81,13 +81,7 @@ def json_response(fn):
     return response
 
 
-
-def is_test():
-    if 'WEBPY_ENV' in os.environ:
-        return os.environ['WEBPY_ENV'] == 'test'
-
-
 if __name__ == "__main__":
-    if not is_test():
+    if not test_mode():
         logger.info("Starting API...")
         app.run()

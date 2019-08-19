@@ -11,6 +11,10 @@ def debug_mode():
     return 'API_DEBUG' in os.environ and os.environ['API_DEBUG'] in trues
 
 
+def test_mode():
+    return os.environ.get('WEBPY_ENV') == 'test'
+
+
 def logger_instance(name):
     level = logging.NOTSET if debug_mode() else logging.ERROR
     logging.basicConfig(level=level)
