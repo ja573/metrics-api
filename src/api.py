@@ -81,6 +81,13 @@ def json_response(fn):
     return response
 
 
+
+def is_test():
+    if 'WEBPY_ENV' in os.environ:
+        return os.environ['WEBPY_ENV'] == 'test'
+
+
 if __name__ == "__main__":
-    logger.info("Starting API...")
-    app.run()
+    if not is_test():
+        logger.info("Starting API...")
+        app.run()
