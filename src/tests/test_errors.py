@@ -1,5 +1,5 @@
 from paste.fixture import TestApp
-from nose.tools import *
+from nose.tools import assert_equals
 from api import app
 import os
 import json
@@ -31,7 +31,7 @@ class TestCode():
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json"
         }
-        r = testApp.post('/events', params='{}', headers=headers, status=400)
+        testApp.post('/events', params='{}', headers=headers, status=400)
 
     def test_auth_post_trivial(self):
         testApp = create_t_app()
@@ -43,13 +43,14 @@ class TestCode():
         }
         data = {
             "work_uri": "info:doi:10.11647/obp.0020",
-            "measure_uri":
-              "https://metrics.operas-eu.org/world-reader/users/v1",
+            "measure_uri": "https://metrics.operas-eu.org/"
+                           "world-reader/users/v1",
             "timestamp": "2019-01-01T01:00:00",
-            "country_uri": "urn:iso:std:3166:-2:ES","value":"512"
+            "country_uri": "urn:iso:std:3166:-2:ES",
+            "value": "512"
         }
         params = json.dumps(data, indent=2)
-        r = testApp.post('/events', params=params, headers=headers, status=200)
+        testApp.post('/events', params=params, headers=headers, status=200)
 
     def test_auth_post_readback(self):
         testApp = create_t_app()
@@ -61,10 +62,11 @@ class TestCode():
         }
         data = {
             "work_uri": "info:doi:10.11647/obp.0020",
-            "measure_uri":
-              "https://metrics.operas-eu.org/world-reader/users/v1",
+            "measure_uri": "https://metrics.operas-eu.org/"
+                           "world-reader/users/v1",
             "timestamp": "2019-01-01T01:00:00",
-            "country_uri": "urn:iso:std:3166:-2:ES","value":"512"
+            "country_uri": "urn:iso:std:3166:-2:ES",
+            "value": "512"
         }
         params = json.dumps(data, indent=2)
         r = testApp.post('/events', params=params, headers=headers, status=200)
