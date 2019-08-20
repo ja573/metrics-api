@@ -1,76 +1,43 @@
-from paste.fixture import TestApp
-from nose.tools import assert_equals
-from api import app
-import os
 import json
+from nose.tools import assert_equals
+from .testapp import App, AuthApp
 
-
-def create_t_app():
-    middleware = []
-    testApp = TestApp(app.wsgifunc(*middleware))
-    return testApp
+TEST_EVENT = {
+    "work_uri": "info:doi:10.11647/obp.0020",
+    "measure_uri": "https://metrics.operas-eu.org/world-reader/users/v1",
+    "timestamp": "2019-01-01T01:00:00",
+    "country_uri": "urn:iso:std:3166:-2:ES",
+    "value": 512
+}
 
 
 class TestCode():
-    def test_broken_api(self):
-        testApp = create_t_app()
+    def __init__(self):
+        self.app = App()
+        self.authapp = AuthApp()
 
-        testApp.get('/non-existent-api-call', status=404)
+    def test_broken_api(self):
+        self.app.get('/non-existent-api-call', status=404)
 
     def test_unauth_post(self):
-        testApp = create_t_app()
-
         payload = {}
-        testApp.post('/events', payload, status=403)
+        self.app.post('/events', payload, status=403)
 
     def test_auth_post_empty(self):
-        testApp = create_t_app()
-
-        token = os.environ.get("TOKEN")
-        headers = {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
-        testApp.post('/events', params='{}', headers=headers, status=400)
+        headers = self.authapp.auth_headers
+        self.authapp.post('/events', params='{}', headers=headers, status=400)
 
     def test_auth_post_trivial(self):
-        testApp = create_t_app()
-
-        token = os.environ.get("TOKEN")
-        headers = {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
-        data = {
-            "work_uri": "info:doi:10.11647/obp.0020",
-            "measure_uri": "https://metrics.operas-eu.org/"
-                           "world-reader/users/v1",
-            "timestamp": "2019-01-01T01:00:00",
-            "country_uri": "urn:iso:std:3166:-2:ES",
-            "value": "512"
-        }
-        params = json.dumps(data, indent=2)
-        testApp.post('/events', params=params, headers=headers, status=200)
+        headers = self.authapp.auth_headers
+        self.app.post('/events', params=json.dumps(TEST_EVENT),
+                      headers=headers, status=200)
 
     def test_auth_post_readback(self):
-        testApp = create_t_app()
-
-        token = os.environ.get("TOKEN")
-        headers = {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
-        data = {
-            "work_uri": "info:doi:10.11647/obp.0020",
-            "measure_uri": "https://metrics.operas-eu.org/"
-                           "world-reader/users/v1",
-            "timestamp": "2019-01-01T01:00:00",
-            "country_uri": "urn:iso:std:3166:-2:ES",
-            "value": "512"
-        }
-        params = json.dumps(data, indent=2)
-        r = testApp.post('/events', params=params, headers=headers, status=200)
+        headers = self.authapp.auth_headers
+        r = self.app.post('/events', params=json.dumps(TEST_EVENT),
+                          headers=headers, status=200)
 
         results = json.loads(r.body.decode('utf-8'))
         assert_equals(results["status"], "ok")
-        print(results["data"][0]["event_id"])
+        for key, value in TEST_EVENT.items():
+            assert_equals(results["data"][0][key], TEST_EVENT[key])
