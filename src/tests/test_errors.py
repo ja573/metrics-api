@@ -69,8 +69,6 @@ class TestCode():
         params = json.dumps(data, indent=2)
         r = testApp.post('/events', params=params, headers=headers, status=200)
 
-        results = json.loads(r.body)
+        results = json.loads(r.body.decode('utf-8'))
         assert_equals(results["status"], "ok")
         print(results["data"][0]["event_id"])
-
-#            # r.mustcontain('Hello, world!')
