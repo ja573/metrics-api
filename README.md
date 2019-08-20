@@ -39,4 +39,8 @@ $ docker-compose up
 Test
 ====
 
-$ docker exec -it metrics_api env WEBPY_ENV=test nosetests
+    $ env-vars ()
+    {
+        awk -F= '{printf "'%s=%s' ", $1, $2}' config/test_api.env
+    }
+    $ docker exec -it metrics_api env $(env-vars) nosetests -v
