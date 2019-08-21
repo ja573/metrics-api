@@ -11,4 +11,4 @@ before_script:
   - for f in ./src/tests/fixtures/metrics_db/sql/* ; do psql -d $POSTGRES_DB -f $f ; done
 script:
   - flake8 ./src/*
-  - nosetests ./src
+  - . ./config/test.env && nosetests ./src
