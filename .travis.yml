@@ -7,6 +7,10 @@ env:
   - ALLOW_ORIGIN=*
   - API_DEBUG=False
   - SECRET_KEY=
+  - POSTGRES_HOST=localhost
+  - POSTGRES_USER=postgres
+  - POSTGRES_PASSWORD=
+  - POSTGRES_DB=metrics
 install:
   - pip install -r ./config/requirements.txt
 before_script:
