@@ -1,7 +1,15 @@
 language: python
 python:
   - "3.5"
+services:
+  - postgresql
+addons:
+  postgresql: "11"
 install:
   - pip install -r ./config/requirements.txt
+before_script:
+  - psql -c 'create database metrics;' -U postgres
+  - for f in ./src/tests/fixtures/metrics_db/sql/* ; do psql -f $f ; done
 script:
   - flake8 ./src/*
+  - nosetests ./src
