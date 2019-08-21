@@ -19,4 +19,4 @@ class App(TestApp):
 
 
 class AuthApp(App):
-    _token = os.environ.get('TOKEN')
+    _token = os.environ.get('USER_TOKEN')
